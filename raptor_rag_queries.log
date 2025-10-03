@@ -1,0 +1,8 @@
+2025-10-03 17:53:52,281 - INFO - HTTP Request: POST http://127.0.0.1:11434/api/embed "HTTP/1.1 200 OK"
+2025-10-03 17:53:52,333 - INFO - HTTP Request: POST http://127.0.0.1:11434/api/embed "HTTP/1.1 200 OK"
+2025-10-03 17:53:52,384 - INFO - HTTP Request: POST http://127.0.0.1:11434/api/embed "HTTP/1.1 200 OK"
+2025-10-03 17:53:52,435 - INFO - HTTP Request: POST http://127.0.0.1:11434/api/embed "HTTP/1.1 200 OK"
+2025-10-03 17:53:52,439 - WARNING - Context length (15313) exceeds maximum (8000). Truncating...
+2025-10-03 17:53:52,439 - INFO - Processing question with 15 chunks from 1 sources
+2025-10-03 17:54:29,011 - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2025-10-03 17:54:29,012 - INFO - Answer generated successfully in 36.57 seconds
