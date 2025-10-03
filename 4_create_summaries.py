@@ -75,7 +75,7 @@ for file in summary_tree.keys():
                 "source": [chunk["id"] for chunk in batch]
             })
 
-            print(f"\t\t🔹Summarized batch {i}-{i+5} -> Summary ID: {file}_summary_{i//5}_level_{next_level_num}")
+            print(f"\t\t🔹Summarized batch {i}-{i+4} -> Summary ID: {file}_summary_{i//5}_level_{next_level_num}")
 
         summary_levels[next_name] = next_level
         summary_tree[file]["levels"] = summary_levels
@@ -83,7 +83,7 @@ for file in summary_tree.keys():
 
         print(f"\t🟢 Completed Level {next_level_num}; Total Chunks: {len(next_level)}")
 
-    print(f"✅ Finished processing {file}.")
+    print(f"✅ Finished processing {file}.\n")
 
     with open('essentials/summary_tree.json', 'w', encoding="utf-16") as out_f:
         json.dump(summary_tree, out_f, ensure_ascii=False, indent=4)
