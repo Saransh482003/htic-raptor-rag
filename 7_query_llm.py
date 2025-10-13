@@ -5,6 +5,10 @@ import time
 from datetime import datetime
 from typing import List, Optional
 import json
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
 
 # Configure logging
 logging.basicConfig(
@@ -17,18 +21,10 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-# Configuration
-CONFIG = {
-    "model": "llama3",
-    "temperature": 0.2,
-    "top_p": 0.9,
-    "top_k": 40,
-    "repeat_penalty": 1.1,
-    "max_context_length": 8000,
-    "default_top_k_root": 2,
-    "default_top_k_children": 3
-}
+CONFIG = json.loads(os.getenv("OLLAMA_LLM_RESPONSE_CONFIG"))
 
+with open(os.getenv("HIERARCHY_STORE_PATH"), "r", encoding="utf-16") as f:
+    summary_tree = json.load(f)
 
 def validate_context_length(context_text: str, max_length: int = CONFIG["max_context_length"]) -> str:
     """Validate and truncate context if too long."""
@@ -49,18 +45,38 @@ def answer_llm(question: str, context: List, show_sources: bool = True) -> str:
     
     # Format context with source information
     formatted_context = []
-    sources = set()
+    sources = []  # Changed to list to keep all chunks, not just unique sources
     
-    for doc in context:
+    for i, doc in enumerate(context):
         content = doc.page_content
-        source = doc.metadata.get('source', 'Unknown source')
+        # Fix: Use 'file_id' instead of 'source'
+        source = doc.metadata.get('file_id', 'Unknown source')
         chunk_id = doc.metadata.get('id', 'Unknown chunk')
+        level = doc.metadata.get('level', 'Unknown level')
         
-        sources.add(source)
-        formatted_context.append(f"[Chunk: {chunk_id}]\n{content}")
+        # Add more descriptive source information
+        if source != 'Unknown source':
+            # Clean up the source name for better readability
+            clean_source = source.replace('_manual_extracted', ' Manual').replace('_', ' ').title()
+            # Store file, chunk ID, and content for sources section
+            chunk_info = {
+                'file': clean_source,
+                'chunk_id': chunk_id,
+                'content': content[:500] + "..." if len(content) > 500 else content  # Truncate long content
+            }
+            sources.append(chunk_info)
+            formatted_context.append(f"[Source: {clean_source} | Level: {level} | Chunk: {chunk_id}]\n{content}")
+        else:
+            chunk_info = {
+                'file': 'Unknown source',
+                'chunk_id': chunk_id,
+                'content': content[:500] + "..." if len(content) > 500 else content
+            }
+            sources.append(chunk_info)
+            formatted_context.append(f"[Chunk: {chunk_id}]\n{content}")
     
     context_text = "\n\n".join(formatted_context)
-    context_text = validate_context_length(context_text)
+    # context_text = validate_context_length(context_text)
     
     logger.info(f"Processing question with {len(context)} chunks from {len(sources)} sources")
 
@@ -124,8 +140,12 @@ def answer_llm(question: str, context: List, show_sources: bool = True) -> str:
         
         # Add source information if requested
         if show_sources and sources:
-            source_list = '\n'.join([f"• {source}" for source in sorted(sources)])
-            final_answer += f"\n\n**Sources consulted:**\n{source_list}"
+            source_entries = []
+            for i, source_info in enumerate(sources, 1):
+                entry = f"**{i}. {source_info['file']} - {source_info['chunk_id']}**\n{source_info['content']}"
+                source_entries.append(entry)
+            source_list = '\n\n'.join(source_entries)
+            final_answer += f"\n\n{"="*70}\n💡 Sources consulted\n{"="*70}\n\n{source_list}"
         
         # Log successful completion
         elapsed_time = time.time() - start_time
@@ -224,13 +244,14 @@ def interactive_query():
             start_time = time.time()
             
             # Retrieve with optimized parameters for biomedical content
-            results = raptor_retrieve(query, top_k_root=CONFIG["default_top_k_root"], top_k_children=CONFIG["default_top_k_children"])
+            raptor_response = raptor_retrieve(query, summary_tree, top_k_root=CONFIG["default_top_k_root"], top_k_children=CONFIG["default_top_k_children"])
             
-            if not results:
+            if not raptor_response:
                 print("❌ No relevant information found. Try rephrasing your question.")
                 continue
-            
-            print(f"📚 Found {len(results)} relevant chunks across hierarchy levels")
+
+            results = raptor_response[:int(os.getenv("MAX_RETRIEVED_CHUNKS", 5))]
+            print(f"📚 Found {len(raptor_response)} relevant chunks across hierarchy levels")
             print("\n🤖 Generating comprehensive answer...\n")
             
             # Generate answer
@@ -240,8 +261,13 @@ def interactive_query():
             # Extract sources for history
             sources = set()
             for doc in results:
-                source = doc.metadata.get('source', 'Unknown source')
-                sources.add(source)
+                # Fix: Use 'file_id' instead of 'source'
+                source = doc.metadata.get('file_id', 'Unknown source')
+                if source != 'Unknown source':
+                    clean_source = source.replace('_manual_extracted', ' Manual').replace('_', ' ').title()
+                    sources.add(clean_source)
+                else:
+                    sources.add(source)
             
             print("=" * 70)
             print("📋 ANSWER:")
@@ -268,8 +294,8 @@ def single_query(question: str, top_k_root: Optional[int] = None, top_k_children
     
     logger.info(f"Processing single query: {question[:100]}...")
     start_time = time.time()
-    
-    results = raptor_retrieve(question, top_k_root=top_k_root, top_k_children=top_k_children)
+
+    results = raptor_retrieve(question, summary_tree, top_k_root=top_k_root, top_k_children=top_k_children)
     answer = answer_llm(question, results, show_sources=show_sources)
     
     response_time = time.time() - start_time
@@ -277,8 +303,13 @@ def single_query(question: str, top_k_root: Optional[int] = None, top_k_children
     # Extract sources for history
     sources = set()
     for doc in results:
-        source = doc.metadata.get('source', 'Unknown source')
-        sources.add(source)
+        # Fix: Use 'file_id' instead of 'source'
+        source = doc.metadata.get('file_id', 'Unknown source')
+        if source != 'Unknown source':
+            clean_source = source.replace('_manual_extracted', ' Manual').replace('_', ' ').title()
+            sources.add(clean_source)
+        else:
+            sources.add(source)
     
     # Save to history
     save_query_history(question, answer, list(sources), response_time)

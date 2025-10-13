@@ -1,0 +1,12 @@
+embeddings = OllamaEmbeddings(model="nomic-embed-text")
+
+# Initialize Chroma vectorstore (persistent)
+vectorstore = Chroma.from_texts(
+    texts=texts,
+    embedding=embeddings,
+    metadatas=metadatas,
+    persist_directory="./chroma_store"
+)
+
+vectorstore.persist()  # ensure it’s saved to disk
+print("✅ Chroma index built and saved to ./chroma_store")

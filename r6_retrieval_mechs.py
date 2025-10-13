@@ -1,8 +1,12 @@
 import json
 from langchain_ollama import OllamaEmbeddings
-from langchain_community.vectorstores import Chroma
+from langchain_chroma import Chroma
 import warnings
 warnings.filterwarnings("ignore")
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
 
 # Load vectorstore
 embeddings = OllamaEmbeddings(model="nomic-embed-text")
@@ -12,11 +16,10 @@ vectorstore = Chroma(
 )
 
 # Load original summary tree (for hierarchy reference if needed)
-with open("./essentials/summary_tree.json", "r", encoding="utf-16") as f:
+with open(os.getenv("HIERARCHY_STORE_PATH"), "r", encoding="utf-16") as f:
     summary_tree = json.load(f)
 
-
-def raptor_retrieve(query, top_k_root=1, top_k_children=2):
+def raptor_retrieve(query, summary_tree, top_k_root=1, top_k_children=2):
     """
     Perform RAPTOR-style hierarchical retrieval.
     """
@@ -58,9 +61,8 @@ def raptor_retrieve(query, top_k_root=1, top_k_children=2):
     children = []
     for doc in root_results:
         children.extend(json.loads(doc.metadata["chunk_source"]))
-    
     return descend(children)
 
 
 query = "How does the SphygmoCor XCEL measure blood pressure?"
-results = raptor_retrieve(query)
+results = raptor_retrieve(query,summary_tree)
