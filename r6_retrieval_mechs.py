@@ -22,6 +22,7 @@ with open(os.getenv("HIERARCHY_STORE_PATH"), "r", encoding="utf-16") as f:
 def raptor_retrieve(query, summary_tree, top_k_root=1, top_k_children=2):
     """
     Perform RAPTOR-style hierarchical retrieval.
+    Returns all documents from all levels traversed (root summaries, intermediate summaries, and leaf chunks).
     """
 
     root_level_map = {}
@@ -33,11 +34,16 @@ def raptor_retrieve(query, summary_tree, top_k_root=1, top_k_children=2):
 
     root_ids = list(root_level_map.keys())
 
+    # Retrieve top-k root-level summaries
     root_results = vectorstore.similarity_search(
         query,
         k=top_k_root,
         filter={"id": {"$in": root_ids}}
     )
+
+    # Store all retrieved documents from all levels
+    all_results = []
+    all_results.extend(root_results)  # Add root-level summaries
 
     def descend(children):
         if all(cid.endswith("level_0") for cid in children):
@@ -46,22 +52,27 @@ def raptor_retrieve(query, summary_tree, top_k_root=1, top_k_children=2):
                 k=len(children),
                 filter={"id": {"$in": children}}
             )
-            return child_results
+            all_results.extend(child_results)  # Add leaf chunks
+            return
         
         child_results = vectorstore.similarity_search(
             query,
             k=min(top_k_children, len(children)),
             filter={"id": {"$in": children}}
         )
+        all_results.extend(child_results)  # Add intermediate summaries
+        
         next_children = []
         for doc in child_results:
             next_children.extend(json.loads(doc.metadata["chunk_source"]))
-        return descend(next_children)
+        descend(next_children)
 
     children = []
     for doc in root_results:
         children.extend(json.loads(doc.metadata["chunk_source"]))
-    return descend(children)
+    descend(children)
+    
+    return all_results
 
 
 query = "How does the SphygmoCor XCEL measure blood pressure?"
