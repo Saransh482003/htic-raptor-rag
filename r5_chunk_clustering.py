@@ -26,9 +26,9 @@ def gmm_umap_clustering(embeddings, n_neighbors=CONFIG["n_neighbors"], n_compone
     
     reducer = umap.UMAP(n_neighbors=n_neighbors_safe, n_components=n_components_safe, init="random", random_state=42)
     reduced_embeddings = reducer.fit_transform(embeddings)
-    print(reduced_embeddings.shape, embeddings.shape)
+    # print(reduced_embeddings.shape, embeddings.shape)
     n_clusters = math.ceil(n_samples // n_clusters)
-    print(n_clusters)
+    # print(n_clusters)
     best_gmm = GaussianMixture(n_components=n_clusters, covariance_type='full', random_state=42)
     cluster_labels = best_gmm.fit_predict(reduced_embeddings)
 

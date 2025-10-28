@@ -9,7 +9,7 @@ import os
 load_dotenv()
 
 # Load vectorstore
-embeddings = OllamaEmbeddings(model="nomic-embed-text")
+embeddings = OllamaEmbeddings(model=os.getenv("OLLAMA_EMBEDDINGS_MODEL"), base_url="http://127.0.0.1:11434")
 vectorstore = Chroma(
     persist_directory="./chroma_store",
     embedding_function=embeddings

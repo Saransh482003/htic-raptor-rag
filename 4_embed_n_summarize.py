@@ -11,12 +11,17 @@ from r5_chunk_clustering import gmm_umap_clustering
 import matplotlib.pyplot as plt
 from dotenv import load_dotenv
 import warnings
+import json
+import json5
+import re
 warnings.filterwarnings("ignore")
 
 load_dotenv()
 import os
 
-embedding_model = OllamaEmbeddings(model=os.getenv("OLLAMA_EMBEDDINGS_MODEL"))
+OLLAMA_BASE_URL = "http://127.0.0.1:11434"
+
+embedding_model = OllamaEmbeddings(model=os.getenv("OLLAMA_EMBEDDINGS_MODEL"),base_url=OLLAMA_BASE_URL)
 persist_path = os.getenv("CHROMA_PERSIST_PATH", "./chroma_store")
 os.makedirs(persist_path, exist_ok=True)
 
@@ -26,8 +31,52 @@ vectorstore = Chroma(
 )
 collection = vectorstore._collection
 
+def extract_clean_json(text: str):
+    """Safely extract and clean JSON-like data (even if single-quoted or malformed)."""
+    if not isinstance(text, str):
+        return text  # already parsed
+    
+    # 1️⃣ Extract JSON-like portion
+    match = re.search(r"\{.*\}", text, re.DOTALL)
+    if not match:
+        return {"summary": text.strip()}
+    candidate = match.group(0)
+    
+    # 2️⃣ Normalize quotes and weird Unicode
+    candidate = (
+        candidate.replace("“", '"')
+        .replace("”", '"')
+        .replace("’", "'")
+        .replace("`", "'")
+        .replace("\u2011", "-")  # non-breaking hyphen
+        .replace("\u00A0", " ")  # non-breaking space
+    )
+    
+    # 3️⃣ Detect Python-style dict → convert to JSON
+    if re.match(r"^\s*\{\'", candidate):  
+        # Replace single quotes around keys
+        candidate = re.sub(r"'(\w+)'(\s*):", r'"\1"\2:', candidate)
+        # Replace single quotes around string values safely
+        def _replace_value_quotes(m):
+            inner = m.group(1).replace('"', '\\"')
+            return f': "{inner}"'
+        candidate = re.sub(r":\s*'(.*?)'(?=[,\}])", _replace_value_quotes, candidate)
+    
+    # 4️⃣ Remove extra backslashes or newlines
+    candidate = candidate.replace("\\n", " ").replace("\\", "")
+    
+    # 5️⃣ Try parsing
+    for parser in (json.loads, json5.loads):
+        try:
+            return parser(candidate)
+        except Exception:
+            continue
+    
+    # 6️⃣ Fallback: return text safely wrapped in JSON
+    return {"summary": candidate.strip()}
+
 def create_summaries(batch, level):
-    llm = ChatOllama(model=os.getenv("OLLAMA_SUMMARY_MODEL"), temperature=0)
+    llm = ChatOllama(model=os.getenv("OLLAMA_SUMMARY_MODEL"), base_url=OLLAMA_BASE_URL,temperature=0)
 
     summary_prompt = PromptTemplate(
         input_variables=["text", "level"],
@@ -48,7 +97,9 @@ def create_summaries(batch, level):
             - For higher-level summaries (level ≥ 2), focus more on abstraction and generalization, keeping it 2-3 sentences.  
 
             ### Output format:
-            Return only valid JSON with a single key "summary". Example:
+            Return the summary in **strict JSON** format only, no explanations, no extra text, no invalid punctuations. A single key "summary". 
+            The response should be plain simple text, NO markdown styling, no new line charaters
+            Example:
             {{
                 "summary": "Concise summary text here."
             }}
@@ -61,8 +112,9 @@ def create_summaries(batch, level):
     text = "\n\n".join([chunk["text"] for chunk in batch])
     summary_chain = LLMChain(llm=llm, prompt=summary_prompt)
     response = summary_chain.run(text=text, level=level)
-    summary = json.loads(response[response.find('{'):response.rfind('}')+1])
+    summary = extract_clean_json(response[response.find('{'):response.rfind('}')+1].replace("\\", "/").replace("\"", "\'").replace("\n", " "))
     return summary
+
 
 
 with open(os.getenv("HIERARCHY_STORE_PATH"), 'r', encoding="utf-16") as f:

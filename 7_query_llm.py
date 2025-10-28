@@ -7,6 +7,7 @@ from typing import List, Optional
 import json
 from dotenv import load_dotenv
 import os
+from ollama import Client
 
 load_dotenv()
 
@@ -110,7 +111,8 @@ def answer_llm(question: str, context: List, show_sources: bool = True) -> str:
     """
 
     try:
-        response = ollama.chat(
+        client = Client(host="http://127.0.0.1:11434")
+        response = client.chat(
             model=CONFIG["model"],
             messages=[{"role": "user", "content": prompt}],
             options={
@@ -145,7 +147,7 @@ def answer_llm(question: str, context: List, show_sources: bool = True) -> str:
                 entry = f"**{i}. {source_info['file']} - {source_info['chunk_id']}**\n{source_info['content']}"
                 source_entries.append(entry)
             source_list = '\n\n'.join(source_entries)
-            final_answer += f"\n\n{"="*70}\n💡 Sources consulted\n{"="*70}\n\n{source_list}"
+            final_answer += f"\n\n{'='*70}\n💡 Sources consulted\n{'='*70}\n\n{source_list}"
         
         # Log successful completion
         elapsed_time = time.time() - start_time
@@ -160,34 +162,34 @@ def answer_llm(question: str, context: List, show_sources: bool = True) -> str:
     
 
 
-def save_query_history(question: str, answer: str, sources: List[str], response_time: float):
-    """Save query history to JSON file."""
-    try:
-        history_entry = {
-            "timestamp": datetime.now().isoformat(),
-            "question": question,
-            "answer": answer,
-            "sources": list(sources),
-            "response_time": response_time,
-            "model": CONFIG["model"]
-        }
+# def save_query_history(question: str, answer: str, sources: List[str], response_time: float):
+#     """Save query history to JSON file."""
+#     try:
+#         history_entry = {
+#             "timestamp": datetime.now().isoformat(),
+#             "question": question,
+#             "answer": answer,
+#             "sources": list(sources),
+#             "response_time": response_time,
+#             "model": CONFIG["model"]
+#         }
         
-        # Load existing history
-        try:
-            with open("query_history.json", "r", encoding="utf-8") as f:
-                history = json.load(f)
-        except FileNotFoundError:
-            history = []
+#         # Load existing history
+#         try:
+#             with open("query_history.json", "r", encoding="utf-8") as f:
+#                 history = json.load(f)
+#         except FileNotFoundError:
+#             history = []
         
-        # Add new entry
-        history.append(history_entry)
+#         # Add new entry
+#         history.append(history_entry)
         
-        # Save updated history
-        with open("query_history.json", "w", encoding="utf-8") as f:
-            json.dump(history, f, indent=2, ensure_ascii=False)
+#         # Save updated history
+#         with open("query_history.json", "w", encoding="utf-8") as f:
+#             json.dump(history, f, indent=2, ensure_ascii=False)
             
-    except Exception as e:
-        logger.error(f"Failed to save query history: {str(e)}")
+#     except Exception as e:
+#         logger.error(f"Failed to save query history: {str(e)}")
 
 
 def interactive_query():
@@ -221,20 +223,20 @@ def interactive_query():
                     print(f"• {key}: {value}")
                 continue
             
-            if query.lower() == 'stats':
-                try:
-                    with open("query_history.json", "r", encoding="utf-8") as f:
-                        history = json.load(f)
-                    print(f"\n📊 Query Statistics:")
-                    print(f"• Total queries: {len(history)}")
-                    if history:
-                        avg_time = sum(entry.get('response_time', 0) for entry in history) / len(history)
-                        print(f"• Average response time: {avg_time:.2f} seconds")
-                        recent_query = history[-1]
-                        print(f"• Last query: {recent_query['timestamp']}")
-                except FileNotFoundError:
-                    print("\n📊 No query history found yet.")
-                continue
+            # if query.lower() == 'stats':
+            #     try:
+            #         with open("query_history.json", "r", encoding="utf-8") as f:
+            #             history = json.load(f)
+            #         print(f"\n📊 Query Statistics:")
+            #         print(f"• Total queries: {len(history)}")
+            #         if history:
+            #             avg_time = sum(entry.get('response_time', 0) for entry in history) / len(history)
+            #             print(f"• Average response time: {avg_time:.2f} seconds")
+            #             recent_query = history[-1]
+            #             print(f"• Last query: {recent_query['timestamp']}")
+            #     except FileNotFoundError:
+            #         print("\n📊 No query history found yet.")
+            #     continue
             
             if not query:
                 print("⚠️  Please enter a valid question.")
@@ -244,7 +246,7 @@ def interactive_query():
             start_time = time.time()
             
             # Retrieve with optimized parameters for biomedical content
-            raptor_response = raptor_retrieve(query, summary_tree, top_k_root=CONFIG["default_top_k_root"], top_k_children=CONFIG["default_top_k_children"])
+            raptor_response = raptor_retrieve(query, summary_tree, top_k_root=3, top_k_children=CONFIG["default_top_k_children"])
             
             if not raptor_response:
                 print("❌ No relevant information found. Try rephrasing your question.")
@@ -277,7 +279,7 @@ def interactive_query():
             print(f"⏱️  Response time: {response_time:.2f} seconds")
             
             # Save to history
-            save_query_history(query, answer, list(sources), response_time)
+            # save_query_history(query, answer, list(sources), response_time)
             
         except KeyboardInterrupt:
             print("\n\n👋 Session interrupted. Goodbye!")
@@ -312,7 +314,7 @@ def single_query(question: str, top_k_root: Optional[int] = None, top_k_children
             sources.add(source)
     
     # Save to history
-    save_query_history(question, answer, list(sources), response_time)
+    # save_query_history(question, answer, list(sources), response_time)
     
     return answer
 
