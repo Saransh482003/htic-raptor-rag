@@ -31,103 +31,49 @@ vectorstore = Chroma(
 )
 collection = vectorstore._collection
 
-def extract_clean_json(text):
-    """Extract a JSON object with a 'summary' field from an LLM response.
-    Guarantees a dict return of shape {"summary": <plain string>} without stringifying dicts.
-    """
-    def _clean_spaces(s: str) -> str:
-        return re.sub(r"\s+", " ", s).strip()
-
-    # If already a dict from upstream, coerce to expected shape
-    if isinstance(text, dict):
-        if isinstance(text.get("summary"), str):
-            return {"summary": _clean_spaces(text["summary"])}
-        # Try to salvage a string from any nested value
-        def _first_str(v):
-            if isinstance(v, str):
-                return v
-            if isinstance(v, dict):
-                for vv in v.values():
-                    s = _first_str(vv)
-                    if s:
-                        return s
-            if isinstance(v, list):
-                for vv in v:
-                    s = _first_str(vv)
-                    if s:
-                        return s
-            return None
-        found = _first_str(text)
-        return {"summary": _clean_spaces(found) if found else ""}
-
-    # If not a string, stringify minimally but do not embed dict-looking text
+def extract_clean_json(text: str):
+    """Safely extract and clean JSON-like data (even if single-quoted or malformed)."""
     if not isinstance(text, str):
-        return {"summary": _clean_spaces(str(text))}
-
-    raw = text
+        return text  # already parsed
     
-    # 1) Try to locate a JSON-like block
-    match = re.search(r"\{.*\}", raw, re.DOTALL)
-    candidate = match.group(0) if match else None
-
-    # Normalization helper for candidate JSON text
-    def _normalize_jsonish(s: str) -> str:
-        s = (
-            s.replace("“", '"')
-             .replace("”", '"')
-             .replace("’", "'")
-             .replace("`", "'")
-             .replace("\u2011", "-")
-             .replace("\u00A0", " ")
-        )
-        # Convert Python-style dicts to JSON
-        if re.match(r"^\s*\{\'", s):
-            s = re.sub(r"'(\w+)'(\s*):", r'"\1"\2:', s)
-            def _replace_value_quotes(m):
-                inner = m.group(1).replace('"', '\\"')
-                return f': "{inner}"'
-            s = re.sub(r":\s*'(.*?)'(?=[,\}])", _replace_value_quotes, s)
-        # Keep escapes, but normalize newlines
-        s = s.replace("\\n", " ")
-        return s
-
-    # 2) If we have a JSON-ish candidate, try to parse it strictly first
-    if candidate:
-        cand = _normalize_jsonish(candidate)
-        for parser in (json.loads, json5.loads):
-            try:
-                parsed = parser(cand)
-                if isinstance(parsed, dict) and isinstance(parsed.get("summary"), str):
-                    return {"summary": _clean_spaces(parsed["summary"])}
-                # If parsed but no 'summary', try to extract a reasonable string
-                def _first_str(v):
-                    if isinstance(v, str):
-                        return v
-                    if isinstance(v, dict):
-                        for vv in v.values():
-                            s = _first_str(vv)
-                            if s:
-                                return s
-                    if isinstance(v, list):
-                        for vv in v:
-                            s = _first_str(vv)
-                            if s:
-                                return s
-                    return None
-                found = _first_str(parsed)
-                if found:
-                    return {"summary": _clean_spaces(found)}
-            except Exception:
-                continue
-
-        # 3) Regex-extract the summary field even if JSON is malformed
-        m = re.search(r"[\"']summary[\"']\s*:\s*[\"'](.*?)[\"']\s*(?:[,}])", cand, re.DOTALL)
-        if m:
-            val = m.group(1)
-            return {"summary": _clean_spaces(val)}
-
-    # 4) Fallback: use the raw response text (not a JSON-looking string) as summary
-    return {"summary": _clean_spaces(raw)}
+    # 1️⃣ Extract JSON-like portion
+    match = re.search(r"\{.*\}", text, re.DOTALL)
+    if not match:
+        return {"summary": text.strip()}
+    candidate = match.group(0)
+    
+    # 2️⃣ Normalize quotes and weird Unicode
+    candidate = (
+        candidate.replace("“", '"')
+        .replace("”", '"')
+        .replace("’", "'")
+        .replace("`", "'")
+        .replace("\u2011", "-")  # non-breaking hyphen
+        .replace("\u00A0", " ")  # non-breaking space
+    )
+    
+    # 3️⃣ Detect Python-style dict → convert to JSON
+    if re.match(r"^\s*\{\'", candidate):  
+        # Replace single quotes around keys
+        candidate = re.sub(r"'(\w+)'(\s*):", r'"\1"\2:', candidate)
+        # Replace single quotes around string values safely
+        def _replace_value_quotes(m):
+            inner = m.group(1).replace('"', '\\"')
+            return f': "{inner}"'
+        candidate = re.sub(r":\s*'(.*?)'(?=[,\}])", _replace_value_quotes, candidate)
+    
+    # 4️⃣ Remove extra backslashes or newlines
+    candidate = candidate.replace("\\n", " ").replace("\\", "")
+    
+    # 5️⃣ Try parsing
+    for parser in (json.loads, json5.loads):
+        try:
+            return parser(candidate)
+        except Exception:
+            continue
+    
+    # 6️⃣ Fallback: return text safely wrapped in JSON
+    return {"summary": candidate.strip()}
 
 def create_summaries(batch, level):
     llm = ChatOllama(model=os.getenv("OLLAMA_SUMMARY_MODEL"), base_url=OLLAMA_BASE_URL,temperature=0)
@@ -166,8 +112,7 @@ def create_summaries(batch, level):
     text = "\n\n".join([chunk["text"] for chunk in batch])
     summary_chain = LLMChain(llm=llm, prompt=summary_prompt)
     response = summary_chain.run(text=text, level=level)
-    # Pass raw response; extractor will robustly parse and always return {"summary": str}
-    summary = extract_clean_json(response)
+    summary = extract_clean_json(response[response.find('{'):response.rfind('}')+1].replace("\\", "/").replace("\"", "\'").replace("\n", " "))
     return summary
 
 

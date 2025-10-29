@@ -5,7 +5,7 @@ vectorstore = Chroma.from_texts(
     texts=texts,
     embedding=embeddings,
     metadatas=metadatas,
-    persist_directory="./chroma_store"
+    persist_directory=os.getenv("CHROMA_PERSIST_PATH", "./chroma_store")
 )
 
 vectorstore.persist()  # ensure it’s saved to disk

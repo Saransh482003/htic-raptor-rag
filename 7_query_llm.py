@@ -78,7 +78,8 @@ def answer_llm(question: str, context: List, show_sources: bool = True) -> str:
     
     context_text = "\n\n".join(formatted_context)
     # context_text = validate_context_length(context_text)
-    
+    print("\n\n\n\n\n")
+    print(context_text)
     logger.info(f"Processing question with {len(context)} chunks from {len(sources)} sources")
 
     prompt = f"""You are an expert biomedical assistant with access to a hierarchical knowledge retrieval system (RAPTOR RAG).
@@ -246,7 +247,7 @@ def interactive_query():
             start_time = time.time()
             
             # Retrieve with optimized parameters for biomedical content
-            raptor_response = raptor_retrieve(query, summary_tree, top_k_root=3, top_k_children=CONFIG["default_top_k_children"])
+            raptor_response = raptor_retrieve(query, summary_tree, top_k_root=CONFIG["default_top_k_root"], top_k_children=CONFIG["default_top_k_children"])
             
             if not raptor_response:
                 print("❌ No relevant information found. Try rephrasing your question.")

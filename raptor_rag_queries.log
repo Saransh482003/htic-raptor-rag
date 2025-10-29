@@ -300,3 +300,144 @@
 2025-10-28 17:20:09,860 - INFO - HTTP Request: POST http://127.0.0.1:11434/api/embed "HTTP/1.1 200 OK"
 2025-10-28 17:20:10,004 - INFO - HTTP Request: POST http://127.0.0.1:11434/api/embed "HTTP/1.1 200 OK"
 2025-10-28 17:20:10,148 - INFO - HTTP Request: POST http://127.0.0.1:11434/api/embed "HTTP/1.1 200 OK"
+2025-10-29 11:28:03,869 - INFO - HTTP Request: POST http://127.0.0.1:11434/api/embed "HTTP/1.1 200 OK"
+2025-10-29 11:28:04,129 - INFO - HTTP Request: POST http://127.0.0.1:11434/api/embed "HTTP/1.1 200 OK"
+2025-10-29 11:28:04,374 - INFO - HTTP Request: POST http://127.0.0.1:11434/api/embed "HTTP/1.1 200 OK"
+2025-10-29 11:28:04,378 - INFO - Processing question with 10 chunks from 10 sources
+2025-10-29 11:28:50,228 - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2025-10-29 11:28:50,229 - INFO - Answer generated successfully in 45.85 seconds
+2025-10-29 11:33:00,320 - INFO - HTTP Request: POST http://127.0.0.1:11434/api/embed "HTTP/1.1 200 OK"
+2025-10-29 11:33:00,504 - INFO - HTTP Request: POST http://127.0.0.1:11434/api/embed "HTTP/1.1 200 OK"
+2025-10-29 11:33:00,672 - INFO - HTTP Request: POST http://127.0.0.1:11434/api/embed "HTTP/1.1 200 OK"
+2025-10-29 11:33:00,676 - INFO - Processing question with 10 chunks from 10 sources
+2025-10-29 11:33:36,204 - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2025-10-29 11:33:36,205 - INFO - Answer generated successfully in 35.53 seconds
+2025-10-29 11:39:53,324 - INFO - HTTP Request: POST http://127.0.0.1:11434/api/embed "HTTP/1.1 200 OK"
+2025-10-29 11:39:53,547 - INFO - HTTP Request: POST http://127.0.0.1:11434/api/embed "HTTP/1.1 200 OK"
+2025-10-29 11:39:53,778 - INFO - HTTP Request: POST http://127.0.0.1:11434/api/embed "HTTP/1.1 200 OK"
+2025-10-29 11:39:54,005 - INFO - HTTP Request: POST http://127.0.0.1:11434/api/embed "HTTP/1.1 200 OK"
+2025-10-29 11:39:54,276 - INFO - HTTP Request: POST http://127.0.0.1:11434/api/embed "HTTP/1.1 200 OK"
+2025-10-29 11:39:54,530 - INFO - HTTP Request: POST http://127.0.0.1:11434/api/embed "HTTP/1.1 200 OK"
+2025-10-29 11:39:58,675 - INFO - HTTP Request: POST http://127.0.0.1:11434/api/embed "HTTP/1.1 200 OK"
+2025-10-29 11:39:58,906 - INFO - HTTP Request: POST http://127.0.0.1:11434/api/embed "HTTP/1.1 200 OK"
+2025-10-29 11:39:59,137 - INFO - HTTP Request: POST http://127.0.0.1:11434/api/embed "HTTP/1.1 200 OK"
+2025-10-29 11:39:59,141 - INFO - Processing question with 10 chunks from 10 sources
+2025-10-29 11:40:34,195 - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2025-10-29 11:40:34,196 - INFO - Answer generated successfully in 35.05 seconds
+2025-10-29 11:41:47,513 - INFO - HTTP Request: POST http://127.0.0.1:11434/api/embed "HTTP/1.1 200 OK"
+2025-10-29 11:41:47,726 - INFO - HTTP Request: POST http://127.0.0.1:11434/api/embed "HTTP/1.1 200 OK"
+2025-10-29 11:41:47,926 - INFO - HTTP Request: POST http://127.0.0.1:11434/api/embed "HTTP/1.1 200 OK"
+2025-10-29 11:41:47,931 - INFO - Processing question with 9 chunks from 9 sources
+2025-10-29 11:42:23,400 - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2025-10-29 11:42:23,401 - INFO - Answer generated successfully in 35.47 seconds
+2025-10-29 11:50:05,579 - INFO - HTTP Request: POST http://127.0.0.1:11434/api/embed "HTTP/1.1 200 OK"
+2025-10-29 11:50:05,804 - INFO - HTTP Request: POST http://127.0.0.1:11434/api/embed "HTTP/1.1 200 OK"
+2025-10-29 11:50:06,047 - INFO - HTTP Request: POST http://127.0.0.1:11434/api/embed "HTTP/1.1 200 OK"
+2025-10-29 11:50:06,050 - INFO - Processing question with 9 chunks from 9 sources
+2025-10-29 11:50:28,557 - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2025-10-29 11:50:28,558 - ERROR - LLM error: 'name'
+2025-10-29 11:52:01,551 - INFO - HTTP Request: POST http://127.0.0.1:11434/api/embed "HTTP/1.1 200 OK"
+2025-10-29 11:52:01,779 - INFO - HTTP Request: POST http://127.0.0.1:11434/api/embed "HTTP/1.1 200 OK"
+2025-10-29 11:52:02,002 - INFO - HTTP Request: POST http://127.0.0.1:11434/api/embed "HTTP/1.1 200 OK"
+2025-10-29 11:52:02,006 - INFO - Processing question with 10 chunks from 10 sources
+2025-10-29 11:52:39,750 - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2025-10-29 11:52:39,750 - INFO - Answer generated successfully in 37.74 seconds
+2025-10-29 11:54:07,816 - INFO - HTTP Request: POST http://127.0.0.1:11434/api/embed "HTTP/1.1 200 OK"
+2025-10-29 11:54:08,039 - INFO - HTTP Request: POST http://127.0.0.1:11434/api/embed "HTTP/1.1 200 OK"
+2025-10-29 11:54:08,266 - INFO - HTTP Request: POST http://127.0.0.1:11434/api/embed "HTTP/1.1 200 OK"
+2025-10-29 11:54:08,270 - INFO - Processing question with 9 chunks from 9 sources
+2025-10-29 11:54:37,453 - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2025-10-29 11:54:37,454 - INFO - Answer generated successfully in 29.18 seconds
+2025-10-29 11:57:29,220 - INFO - HTTP Request: POST http://127.0.0.1:11434/api/embed "HTTP/1.1 200 OK"
+2025-10-29 11:57:29,462 - INFO - HTTP Request: POST http://127.0.0.1:11434/api/embed "HTTP/1.1 200 OK"
+2025-10-29 11:57:29,726 - INFO - HTTP Request: POST http://127.0.0.1:11434/api/embed "HTTP/1.1 200 OK"
+2025-10-29 11:57:29,728 - INFO - Processing question with 7 chunks from 7 sources
+2025-10-29 11:58:01,343 - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2025-10-29 11:58:01,343 - INFO - Answer generated successfully in 31.61 seconds
+2025-10-29 12:03:47,909 - INFO - HTTP Request: POST http://127.0.0.1:11434/api/embed "HTTP/1.1 200 OK"
+2025-10-29 12:03:48,122 - INFO - HTTP Request: POST http://127.0.0.1:11434/api/embed "HTTP/1.1 200 OK"
+2025-10-29 12:03:48,336 - INFO - HTTP Request: POST http://127.0.0.1:11434/api/embed "HTTP/1.1 200 OK"
+2025-10-29 12:03:48,341 - INFO - Processing question with 7 chunks from 7 sources
+2025-10-29 12:04:21,338 - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2025-10-29 12:04:21,339 - INFO - Answer generated successfully in 33.00 seconds
+2025-10-29 12:06:02,032 - INFO - HTTP Request: POST http://127.0.0.1:11434/api/embed "HTTP/1.1 200 OK"
+2025-10-29 12:06:02,268 - INFO - HTTP Request: POST http://127.0.0.1:11434/api/embed "HTTP/1.1 200 OK"
+2025-10-29 12:06:02,547 - INFO - HTTP Request: POST http://127.0.0.1:11434/api/embed "HTTP/1.1 200 OK"
+2025-10-29 12:06:02,553 - INFO - Processing question with 7 chunks from 7 sources
+2025-10-29 12:06:39,997 - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2025-10-29 12:06:39,997 - INFO - Answer generated successfully in 37.45 seconds
+2025-10-29 12:10:33,339 - INFO - HTTP Request: POST http://127.0.0.1:11434/api/embed "HTTP/1.1 200 OK"
+2025-10-29 12:10:33,555 - INFO - HTTP Request: POST http://127.0.0.1:11434/api/embed "HTTP/1.1 200 OK"
+2025-10-29 12:10:33,769 - INFO - HTTP Request: POST http://127.0.0.1:11434/api/embed "HTTP/1.1 200 OK"
+2025-10-29 12:10:33,778 - INFO - Processing question with 9 chunks from 9 sources
+2025-10-29 12:11:00,065 - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2025-10-29 12:11:00,066 - INFO - Answer generated successfully in 26.29 seconds
+2025-10-29 12:12:45,304 - INFO - HTTP Request: POST http://127.0.0.1:11434/api/embed "HTTP/1.1 200 OK"
+2025-10-29 12:12:45,510 - INFO - HTTP Request: POST http://127.0.0.1:11434/api/embed "HTTP/1.1 200 OK"
+2025-10-29 12:12:45,709 - INFO - HTTP Request: POST http://127.0.0.1:11434/api/embed "HTTP/1.1 200 OK"
+2025-10-29 12:12:45,718 - INFO - Processing question with 9 chunks from 9 sources
+2025-10-29 12:13:15,361 - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2025-10-29 12:13:15,362 - INFO - Answer generated successfully in 29.65 seconds
+2025-10-29 12:22:41,154 - INFO - HTTP Request: POST http://127.0.0.1:11434/api/embed "HTTP/1.1 200 OK"
+2025-10-29 12:22:41,515 - INFO - HTTP Request: POST http://127.0.0.1:11434/api/embed "HTTP/1.1 200 OK"
+2025-10-29 12:22:41,728 - INFO - HTTP Request: POST http://127.0.0.1:11434/api/embed "HTTP/1.1 200 OK"
+2025-10-29 12:22:41,737 - INFO - Processing question with 9 chunks from 9 sources
+2025-10-29 12:23:13,179 - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2025-10-29 12:23:13,179 - INFO - Answer generated successfully in 31.44 seconds
+2025-10-29 12:26:23,627 - INFO - HTTP Request: POST http://127.0.0.1:11434/api/embed "HTTP/1.1 200 OK"
+2025-10-29 12:26:23,868 - INFO - HTTP Request: POST http://127.0.0.1:11434/api/embed "HTTP/1.1 200 OK"
+2025-10-29 12:26:24,075 - INFO - HTTP Request: POST http://127.0.0.1:11434/api/embed "HTTP/1.1 200 OK"
+2025-10-29 12:26:24,082 - INFO - Processing question with 9 chunks from 9 sources
+2025-10-29 12:26:58,375 - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2025-10-29 12:26:58,376 - INFO - Answer generated successfully in 34.29 seconds
+2025-10-29 12:29:26,698 - INFO - HTTP Request: POST http://127.0.0.1:11434/api/embed "HTTP/1.1 200 OK"
+2025-10-29 12:29:26,918 - INFO - HTTP Request: POST http://127.0.0.1:11434/api/embed "HTTP/1.1 200 OK"
+2025-10-29 12:34:18,650 - INFO - HTTP Request: POST http://127.0.0.1:11434/api/embed "HTTP/1.1 200 OK"
+2025-10-29 12:34:18,939 - INFO - HTTP Request: POST http://127.0.0.1:11434/api/embed "HTTP/1.1 200 OK"
+2025-10-29 12:34:19,170 - INFO - HTTP Request: POST http://127.0.0.1:11434/api/embed "HTTP/1.1 200 OK"
+2025-10-29 12:34:19,418 - INFO - HTTP Request: POST http://127.0.0.1:11434/api/embed "HTTP/1.1 200 OK"
+2025-10-29 12:34:19,694 - INFO - HTTP Request: POST http://127.0.0.1:11434/api/embed "HTTP/1.1 200 OK"
+2025-10-29 12:34:19,698 - INFO - Processing question with 5 chunks from 5 sources
+2025-10-29 12:34:46,343 - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2025-10-29 12:34:46,344 - INFO - Answer generated successfully in 26.65 seconds
+2025-10-29 12:38:33,327 - INFO - HTTP Request: POST http://127.0.0.1:11434/api/embed "HTTP/1.1 200 OK"
+2025-10-29 12:38:33,538 - INFO - HTTP Request: POST http://127.0.0.1:11434/api/embed "HTTP/1.1 200 OK"
+2025-10-29 12:38:33,750 - INFO - HTTP Request: POST http://127.0.0.1:11434/api/embed "HTTP/1.1 200 OK"
+2025-10-29 12:38:33,942 - INFO - HTTP Request: POST http://127.0.0.1:11434/api/embed "HTTP/1.1 200 OK"
+2025-10-29 12:38:34,137 - INFO - HTTP Request: POST http://127.0.0.1:11434/api/embed "HTTP/1.1 200 OK"
+2025-10-29 12:38:34,140 - INFO - Processing question with 5 chunks from 5 sources
+2025-10-29 12:39:02,925 - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2025-10-29 12:39:02,926 - INFO - Answer generated successfully in 28.79 seconds
+2025-10-29 12:39:40,909 - INFO - HTTP Request: POST http://127.0.0.1:11434/api/embed "HTTP/1.1 200 OK"
+2025-10-29 12:39:41,101 - INFO - HTTP Request: POST http://127.0.0.1:11434/api/embed "HTTP/1.1 200 OK"
+2025-10-29 12:39:41,273 - INFO - HTTP Request: POST http://127.0.0.1:11434/api/embed "HTTP/1.1 200 OK"
+2025-10-29 12:39:41,436 - INFO - HTTP Request: POST http://127.0.0.1:11434/api/embed "HTTP/1.1 200 OK"
+2025-10-29 12:39:41,617 - INFO - HTTP Request: POST http://127.0.0.1:11434/api/embed "HTTP/1.1 200 OK"
+2025-10-29 12:39:41,621 - INFO - Processing question with 5 chunks from 5 sources
+2025-10-29 12:40:11,707 - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2025-10-29 12:40:11,708 - INFO - Answer generated successfully in 30.09 seconds
+2025-10-29 12:41:17,016 - INFO - HTTP Request: POST http://127.0.0.1:11434/api/embed "HTTP/1.1 200 OK"
+2025-10-29 12:41:17,181 - INFO - HTTP Request: POST http://127.0.0.1:11434/api/embed "HTTP/1.1 200 OK"
+2025-10-29 12:41:17,372 - INFO - HTTP Request: POST http://127.0.0.1:11434/api/embed "HTTP/1.1 200 OK"
+2025-10-29 12:41:17,540 - INFO - HTTP Request: POST http://127.0.0.1:11434/api/embed "HTTP/1.1 200 OK"
+2025-10-29 12:41:17,705 - INFO - HTTP Request: POST http://127.0.0.1:11434/api/embed "HTTP/1.1 200 OK"
+2025-10-29 12:41:17,888 - INFO - HTTP Request: POST http://127.0.0.1:11434/api/embed "HTTP/1.1 200 OK"
+2025-10-29 12:41:17,892 - INFO - Processing question with 7 chunks from 7 sources
+2025-10-29 12:41:46,209 - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2025-10-29 12:41:46,209 - INFO - Answer generated successfully in 28.32 seconds
+2025-10-29 12:44:40,237 - INFO - HTTP Request: POST http://127.0.0.1:11434/api/embed "HTTP/1.1 200 OK"
+2025-10-29 12:44:40,502 - INFO - HTTP Request: POST http://127.0.0.1:11434/api/embed "HTTP/1.1 200 OK"
+2025-10-29 12:44:40,672 - INFO - HTTP Request: POST http://127.0.0.1:11434/api/embed "HTTP/1.1 200 OK"
+2025-10-29 12:44:40,836 - INFO - HTTP Request: POST http://127.0.0.1:11434/api/embed "HTTP/1.1 200 OK"
+2025-10-29 12:44:41,000 - INFO - HTTP Request: POST http://127.0.0.1:11434/api/embed "HTTP/1.1 200 OK"
+2025-10-29 12:44:41,004 - INFO - Processing question with 6 chunks from 6 sources
+2025-10-29 12:45:08,163 - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2025-10-29 12:45:08,164 - INFO - Answer generated successfully in 27.16 seconds
+2025-10-29 12:45:42,009 - INFO - HTTP Request: POST http://127.0.0.1:11434/api/embed "HTTP/1.1 200 OK"
+2025-10-29 12:45:42,179 - INFO - HTTP Request: POST http://127.0.0.1:11434/api/embed "HTTP/1.1 200 OK"
+2025-10-29 12:45:42,358 - INFO - HTTP Request: POST http://127.0.0.1:11434/api/embed "HTTP/1.1 200 OK"
+2025-10-29 12:45:42,526 - INFO - HTTP Request: POST http://127.0.0.1:11434/api/embed "HTTP/1.1 200 OK"
+2025-10-29 12:45:42,690 - INFO - HTTP Request: POST http://127.0.0.1:11434/api/embed "HTTP/1.1 200 OK"
+2025-10-29 12:45:42,694 - INFO - Processing question with 6 chunks from 6 sources
+2025-10-29 12:46:13,069 - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2025-10-29 12:46:13,070 - INFO - Answer generated successfully in 30.38 seconds

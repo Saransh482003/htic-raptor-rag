@@ -35,7 +35,7 @@ def gmm_umap_clustering(embeddings, n_neighbors=CONFIG["n_neighbors"], n_compone
     return np.array(reduced_embeddings), np.array(cluster_labels)
 
 
-# vectorstore = Chroma(persist_directory="./chroma_store")
+# vectorstore = Chroma(persist_directory=os.getenv("CHROMA_PERSIST_PATH", "./chroma_store"))
 # collection = vectorstore._collection
 # results = collection.get(include=["embeddings", "documents", "metadatas"])
 # embeddings = np.array(results["embeddings"])
