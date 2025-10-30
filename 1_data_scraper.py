@@ -12,223 +12,170 @@ import markdown
 load_dotenv()
 
 def clean_text(text: str) -> str:
+    """Aggressively clean input text at ingestion time to remove citation noise and
+    formatting artifacts, producing clean, LLM-friendly content before chunking.
+
+    Steps:
+    - ASCII fold and lowercase
+    - Remove control chars and bullets/soft hyphens
+    - Undo line-break hyphenation
+    - Strip numeric citations [1], [1-3], [2, 5] and numeric-only (2019)
+    - Strip bracketed 'et al', 'doi:', or URLs
+    - Normalize spaced hyphens in compounds (incl. single letters: a - mode -> a-mode)
+    - Fix spaced decimals: 2. 71 -> 2.71
+    - Tighten spaces around punctuation and parentheses
+    - Collapse whitespace/newlines
     """
-        Common text cleaning function for all file types.
-        Applies the same cleaning logic as PDF extraction.
-    """
-    text = unidecode(text)
-    text = re.sub(r'[\u0000-\u001F\u007F]', '', text)
-    text = text.encode().decode("unicode_escape")
-    text = text.replace('\"', '\'')
-    text = re.sub(r'\.{5,}\s*\d*', '', text)
-    text = re.sub(r'\s+', ' ', text).strip()
-    cleaned_text = ' '.join(text.split())
-    return cleaned_text
+    if not isinstance(text, str):
+        text = str(text or "")
+
+    t = unidecode(text).lower()
+
+    # Remove control chars
+    t = re.sub(r'[\u0000-\u001f\u007f]', ' ', t)
+
+    # Replace common unicode dashes/bullets/soft hyphens
+    t = t.replace('\u2014', '-')  # em-dash
+    t = t.replace('\u2013', '-')  # en-dash
+    t = t.replace('\u2212', '-')  # minus sign
+    t = t.replace('\u00ad', '')   # soft hyphen
+    t = re.sub(r'[•·●◦∙]', ' ', t)
+
+    # Undo line-break hyphenation (word-\nword -> wordword)
+    t = re.sub(r'-\s*\n\s*', '', t)
+
+    # Drop raw URLs/emails
+    t = re.sub(r'https?://\S+|www\.\S+', ' ', t)
+    t = re.sub(r'\b[\w\.-]+@[\w\.-]+\.[a-z]{2,}\b', ' ', t)
+
+    # Remove numeric citation brackets like [1], [1-3], [1, 2, 3]
+    t = re.sub(r"\[\s*(?:\d{1,4}\s*(?:[-–,;]\s*\d{1,4}\s*)*)\]", "", t)
+    # Remove multiple adjacent citation brackets e.g., ][
+    t = re.sub(r"\]\s*\[", " ", t)
+
+    # Remove numeric-only parentheticals like (2019), (1-3), (1, 2)
+    t = re.sub(r"\(\s*(?:\d{1,4}\s*(?:[-–,;]\s*\d{1,4}\s*)*)\)", "", t)
+
+    # Remove obvious citation-like brackets with 'et al', 'doi', or URLs
+    t = re.sub(r"\[[^\]]*?et\s+al\.[^\]]*\]", "", t, flags=re.IGNORECASE)
+    t = re.sub(r"\[[^\]]*?doi:\s*[^\]]*\]", "", t, flags=re.IGNORECASE)
+    t = re.sub(r"\[[^\]]*?https?://[^\]]*\]", "", t, flags=re.IGNORECASE)
+
+    # Normalize spaced hyphens in compounds (token - token -> token-token)
+    t = re.sub(r"(?i)\b([a-z0-9]+)\s*-\s*([a-z0-9]+)\b", r"\1-\2", t)
+
+    # Fix spaced decimals (e.g., 2. 71 -> 2.71, 4 . 82 -> 4.82)
+    t = re.sub(r"(\d)\s*\.\s*(\d)", r"\1.\2", t)
+
+    # Tighten spaces around parentheses
+    t = re.sub(r"\(\s+", "(", t)
+    t = re.sub(r"\s+\)", ")", t)
+
+    # Remove stray empty brackets
+    t = re.sub(r"\[\s*\]", "", t)
+
+    # Remove spaces before punctuation; ensure single space after , ; : when followed by a word
+    t = re.sub(r"\s+([,.;:!?])", r"\1", t)
+    t = re.sub(r"([,;:])(\S)", r"\1 \2", t)
+
+    # Remove common artifacts like long dotted leaders (TOC) possibly followed by digits
+    t = re.sub(r"(\.{2,}|_{2,}|-{3,})\s*\d*", " ", t)
+
+    # Collapse whitespace and normalize newlines
+    t = re.sub(r"[ \t\f\v]+", " ", t)
+    t = re.sub(r"\s*\n\s*", "\n", t)
+
+    return t.strip()
 
 
 def extract_pdf(pdf_path: str):
-    """
-        Extracts text page by page from a PDF.
-        Returns: list of {"page": int, "text": str, "source": str}
-    """
+    """Extract entire text from a PDF and return a single cleaned block ready for embeddings."""
     doc = fitz.open(pdf_path)
-    pages = []
-    for i, page in enumerate(doc):
-        text = page.get_text("text")
-        text = unidecode(text)
-        text = re.sub(r'[\u0000-\u001F\u007F]', '', text)
-        text = text.encode().decode("unicode_escape")
-        text = text.replace('\"', '\'')
-        text = re.sub(r'\.{5,}\s*\d*', '', text)
-        text = re.sub(r'\s+', ' ', text).strip()
-        cleaned_text = ' '.join(text.split())
-        pages.append({"page": i + 1, "text": cleaned_text, "source": Path(pdf_path).name})
+    texts = []
+    for page in doc:
+        try:
+            texts.append(page.get_text("text") or "")
+        except Exception:
+            continue
     doc.close()
 
+    full_text = "\n".join(texts)
+    cleaned = clean_text(full_text)
+    pages = [{"page": 1, "text": cleaned, "source": Path(pdf_path).name}]
+
     os.makedirs(os.getenv("EXTRACTED_DATA_PATH"), exist_ok=True)
-    with open(f"{os.getenv("EXTRACTED_DATA_PATH")}/{Path(pdf_path).stem}_extracted.json", "w", encoding="utf-16") as f:
-        json.dump(pages, f, indent=4)
+    out_path = os.path.join(os.getenv("EXTRACTED_DATA_PATH"), f"{Path(pdf_path).stem}_extracted.json")
+    with open(out_path, "w", encoding="utf-16") as f:
+        json.dump(pages, f, indent=4, ensure_ascii=False)
     return pages
 
 
 
 def extract_txt(txt_path: str):
-    """
-        Extracts text from a plain text file.
-        Returns: list of {"page": int, "text": str, "source": str}
-        Splits by double newlines to create logical "pages"
-    """
+    """Extract entire text from a TXT file as a single cleaned block."""
     with open(txt_path, 'r', encoding='utf-8', errors='ignore') as f:
         content = f.read()
-    
-    # Split content into chunks by double newlines (paragraphs)
-    chunks = [chunk.strip() for chunk in content.split('\n\n') if chunk.strip()]
-    
-    pages = []
-    for i, chunk in enumerate(chunks):
-        cleaned_text = clean_text(chunk)
-        if cleaned_text:  # Only add non-empty chunks
-            pages.append({"page": i + 1, "text": cleaned_text, "source": Path(txt_path).name})
-    
-    # If no chunks found, treat entire file as one page
-    if not pages:
-        cleaned_text = clean_text(content)
-        pages.append({"page": 1, "text": cleaned_text, "source": Path(txt_path).name})
-    
+    cleaned = clean_text(content)
+    pages = [{"page": 1, "text": cleaned, "source": Path(txt_path).name}]
+
     os.makedirs(os.getenv("EXTRACTED_DATA_PATH"), exist_ok=True)
-    with open(f"{os.getenv("EXTRACTED_DATA_PATH")}/{Path(txt_path).stem}_extracted.json", "w", encoding="utf-16") as f:
-        json.dump(pages, f, indent=4)
+    out_path = os.path.join(os.getenv("EXTRACTED_DATA_PATH"), f"{Path(txt_path).stem}_extracted.json")
+    with open(out_path, "w", encoding="utf-16") as f:
+        json.dump(pages, f, indent=4, ensure_ascii=False)
     return pages
 
 
 def extract_md(md_path: str):
-    """
-        Extracts text from a Markdown file.
-        Returns: list of {"page": int, "text": str, "source": str}
-        Splits by headers to create logical "pages"
-    """
+    """Extract entire text from a Markdown file as a single cleaned block."""
     with open(md_path, 'r', encoding='utf-8', errors='ignore') as f:
         content = f.read()
-    
-    # Convert markdown to HTML then extract text
+
     html_content = markdown.markdown(content)
     soup = BeautifulSoup(html_content, 'html.parser')
-    
-    # Split by headers (h1, h2, h3) to create sections
-    sections = []
-    current_section = []
-    
-    for element in soup.descendants:
-        if element.name in ['h1', 'h2', 'h3']:
-            if current_section:
-                section_text = ' '.join([str(e) for e in current_section if hasattr(e, 'get_text')])
-                sections.append(BeautifulSoup(section_text, 'html.parser').get_text())
-                current_section = []
-        if hasattr(element, 'get_text'):
-            current_section.append(element)
-    
-    # Add last section
-    if current_section:
-        section_text = ' '.join([str(e) for e in current_section if hasattr(e, 'get_text')])
-        sections.append(BeautifulSoup(section_text, 'html.parser').get_text())
-    
-    # If no sections found, use entire text
-    if not sections:
-        sections = [soup.get_text()]
-    
-    pages = []
-    for i, section in enumerate(sections):
-        cleaned_text = clean_text(section)
-        if cleaned_text:
-            pages.append({"page": i + 1, "text": cleaned_text, "source": Path(md_path).name})
-    
+    text = soup.get_text(separator=' ')
+    cleaned = clean_text(text)
+    pages = [{"page": 1, "text": cleaned, "source": Path(md_path).name}]
+
     os.makedirs(os.getenv("EXTRACTED_DATA_PATH"), exist_ok=True)
-    with open(f"{os.getenv("EXTRACTED_DATA_PATH")}/{Path(md_path).stem}_extracted.json", "w", encoding="utf-16") as f:
-        json.dump(pages, f, indent=4)
+    out_path = os.path.join(os.getenv("EXTRACTED_DATA_PATH"), f"{Path(md_path).stem}_extracted.json")
+    with open(out_path, "w", encoding="utf-16") as f:
+        json.dump(pages, f, indent=4, ensure_ascii=False)
     return pages
 
 
 def extract_html(html_path: str):
-    """
-        Extracts text from an HTML or HTM file.
-        Returns: list of {"page": int, "text": str, "source": str}
-        Splits by major sections or headers to create logical "pages"
-    """
+    """Extract entire text from HTML/HTM as a single cleaned block."""
     with open(html_path, 'r', encoding='utf-8', errors='ignore') as f:
         content = f.read()
-    
+
     soup = BeautifulSoup(content, 'html.parser')
-    
-    # Remove script and style elements
-    for script in soup(['script', 'style', 'nav', 'footer', 'header']):
-        script.decompose()
-    
-    # Try to split by major sections
-    sections = []
-    
-    # First try to find sections by div, article, section tags
-    major_elements = soup.find_all(['section', 'article', 'div'], class_=re.compile(r'content|main|section|article'))
-    
-    if major_elements:
-        for element in major_elements:
-            text = element.get_text()
-            if text.strip():
-                sections.append(text)
-    else:
-        # Fall back to splitting by headers
-        headers = soup.find_all(['h1', 'h2', 'h3'])
-        if headers:
-            for i, header in enumerate(headers):
-                section_content = []
-                for sibling in header.next_siblings:
-                    if hasattr(sibling, 'name') and sibling.name in ['h1', 'h2', 'h3']:
-                        break
-                    if hasattr(sibling, 'get_text'):
-                        section_content.append(sibling.get_text())
-                section_text = ' '.join(section_content)
-                if section_text.strip():
-                    sections.append(header.get_text() + ' ' + section_text)
-        else:
-            # Last resort: use entire text
-            sections = [soup.get_text()]
-    
-    pages = []
-    for i, section in enumerate(sections):
-        cleaned_text = clean_text(section)
-        if cleaned_text:
-            pages.append({"page": i + 1, "text": cleaned_text, "source": Path(html_path).name})
-    
+    # Remove non-content elements
+    for tag in soup(['script', 'style', 'nav', 'footer', 'header']):
+        tag.decompose()
+
+    text = soup.get_text(separator=' ')
+    cleaned = clean_text(text)
+    pages = [{"page": 1, "text": cleaned, "source": Path(html_path).name}]
+
     os.makedirs(os.getenv("EXTRACTED_DATA_PATH"), exist_ok=True)
-    with open(f"{os.getenv("EXTRACTED_DATA_PATH")}/{Path(html_path).stem}_extracted.json", "w", encoding="utf-16") as f:
-        json.dump(pages, f, indent=4)
+    out_path = os.path.join(os.getenv("EXTRACTED_DATA_PATH"), f"{Path(html_path).stem}_extracted.json")
+    with open(out_path, "w", encoding="utf-16") as f:
+        json.dump(pages, f, indent=4, ensure_ascii=False)
     return pages
 
 
 def extract_docx(docx_path: str):
-    """
-        Extracts text from a DOCX file.
-        Returns: list of {"page": int, "text": str, "source": str}
-        Each paragraph or section becomes a logical "page"
-    """
+    """Extract entire text from a DOCX file as a single cleaned block."""
     doc = Document(docx_path)
-    
-    pages = []
-    page_num = 1
-    current_text = []
-    
-    for paragraph in doc.paragraphs:
-        text = paragraph.text.strip()
-        if not text:
-            # Empty paragraph might indicate section break
-            if current_text:
-                combined_text = ' '.join(current_text)
-                cleaned_text = clean_text(combined_text)
-                if cleaned_text:
-                    pages.append({"page": page_num, "text": cleaned_text, "source": Path(docx_path).name})
-                    page_num += 1
-                current_text = []
-        else:
-            current_text.append(text)
-            
-            # If paragraph style indicates heading, create a new page
-            if paragraph.style.name.startswith('Heading'):
-                combined_text = ' '.join(current_text)
-                cleaned_text = clean_text(combined_text)
-                if cleaned_text:
-                    pages.append({"page": page_num, "text": cleaned_text, "source": Path(docx_path).name})
-                    page_num += 1
-                current_text = []
-    
-    # Add remaining text
-    if current_text:
-        combined_text = ' '.join(current_text)
-        cleaned_text = clean_text(combined_text)
-        if cleaned_text:
-            pages.append({"page": page_num, "text": cleaned_text, "source": Path(docx_path).name})
-    
+    paragraphs = [p.text for p in doc.paragraphs if p and p.text]
+    full_text = "\n".join(paragraphs)
+    cleaned = clean_text(full_text)
+    pages = [{"page": 1, "text": cleaned, "source": Path(docx_path).name}]
+
     os.makedirs(os.getenv("EXTRACTED_DATA_PATH"), exist_ok=True)
-    with open(f"{os.getenv("EXTRACTED_DATA_PATH")}/{Path(docx_path).stem}_extracted.json", "w", encoding="utf-16") as f:
-        json.dump(pages, f, indent=4)
+    out_path = os.path.join(os.getenv("EXTRACTED_DATA_PATH"), f"{Path(docx_path).stem}_extracted.json")
+    with open(out_path, "w", encoding="utf-16") as f:
+        json.dump(pages, f, indent=4, ensure_ascii=False)
     return pages
 
 

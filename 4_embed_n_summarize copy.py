@@ -7,7 +7,7 @@ from langchain.chains import LLMChain
 from langchain_ollama import OllamaEmbeddings
 from langchain_chroma import Chroma
 from sklearn.preprocessing import StandardScaler
-from r5_chunk_clustering import gmm_umap_clustering
+from mechanics.chunk_clustering import gmm_umap_clustering
 import matplotlib.pyplot as plt
 from dotenv import load_dotenv
 import warnings

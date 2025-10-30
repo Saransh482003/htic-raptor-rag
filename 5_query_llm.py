@@ -1,4 +1,4 @@
-from r6_retrieval_mechs import raptor_retrieve
+from mechanics.retrieval_mechs import raptor_retrieve
 import ollama
 import logging
 import time
