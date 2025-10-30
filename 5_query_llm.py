@@ -8,8 +8,12 @@ import json
 from dotenv import load_dotenv
 import os
 from ollama import Client
+from rich.console import Console
+from rich.markdown import Markdown
 
 load_dotenv()
+
+console = Console()
 
 # Configure logging
 logging.basicConfig(
@@ -78,8 +82,8 @@ def answer_llm(question: str, context: List, show_sources: bool = True) -> str:
     
     context_text = "\n\n".join(formatted_context)
     # context_text = validate_context_length(context_text)
-    print("\n\n\n\n\n")
-    print(context_text)
+    # print("\n\n\n\n\n")
+    # print(context_text)
     logger.info(f"Processing question with {len(context)} chunks from {len(sources)} sources")
 
     prompt = f"""You are an expert biomedical assistant with access to a hierarchical knowledge retrieval system (RAPTOR RAG).
@@ -148,7 +152,8 @@ def answer_llm(question: str, context: List, show_sources: bool = True) -> str:
                 entry = f"**{i}. {source_info['file']} - {source_info['chunk_id']}**\n{source_info['content']}"
                 source_entries.append(entry)
             source_list = '\n\n'.join(source_entries)
-            final_answer += f"\n\n{'='*70}\n💡 Sources consulted\n{'='*70}\n\n{source_list}"
+            final_answer = f"\n\n✅ Answer\n{'='*70}\n\n"+final_answer.replace('_', r'\_')
+            final_answer += f"\n\n💡 Sources consulted\n{'='*70}\n\n{source_list}"
         
         # Log successful completion
         elapsed_time = time.time() - start_time
@@ -161,37 +166,6 @@ def answer_llm(question: str, context: List, show_sources: bool = True) -> str:
         logger.error(f"LLM error: {str(e)}")
         return error_msg
     
-
-
-# def save_query_history(question: str, answer: str, sources: List[str], response_time: float):
-#     """Save query history to JSON file."""
-#     try:
-#         history_entry = {
-#             "timestamp": datetime.now().isoformat(),
-#             "question": question,
-#             "answer": answer,
-#             "sources": list(sources),
-#             "response_time": response_time,
-#             "model": CONFIG["model"]
-#         }
-        
-#         # Load existing history
-#         try:
-#             with open("query_history.json", "r", encoding="utf-8") as f:
-#                 history = json.load(f)
-#         except FileNotFoundError:
-#             history = []
-        
-#         # Add new entry
-#         history.append(history_entry)
-        
-#         # Save updated history
-#         with open("query_history.json", "w", encoding="utf-8") as f:
-#             json.dump(history, f, indent=2, ensure_ascii=False)
-            
-#     except Exception as e:
-#         logger.error(f"Failed to save query history: {str(e)}")
-
 
 def interactive_query():
     """Interactive query interface for RAPTOR RAG system."""
@@ -272,10 +246,12 @@ def interactive_query():
                 else:
                     sources.add(source)
             
-            print("=" * 70)
-            print("📋 ANSWER:")
-            print("=" * 70)
-            print(answer)
+            # print("=" * 70)
+            # print("📋 ANSWER:")
+            # print("=" * 70)
+            answer_prefix = "Answer\n"+"="*70+"\n"
+            markdown_answer = Markdown(answer)
+            console.print(markdown_answer)
             print("=" * 70)
             print(f"⏱️  Response time: {response_time:.2f} seconds")
             

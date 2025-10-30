@@ -25,6 +25,20 @@ def raptor_retrieve(query, summary_tree, top_k_root=1, top_k_children=2):
     Returns all documents from all levels traversed (root summaries, intermediate summaries, and leaf chunks).
     """
 
+    # Helper to append only unseen documents (by stable chunk id)
+    query = query.lower()
+
+    def add_unique(results, collector, seen_ids):
+        for doc in results or []:
+            doc_id = doc.metadata.get("id") if hasattr(doc, "metadata") else None
+            # Fallback to a hash of content if id is missing (very rare)
+            if not doc_id:
+                doc_id = f"pc:{hash(getattr(doc, 'page_content', ''))}"
+            if doc_id in seen_ids:
+                continue
+            seen_ids.add(doc_id)
+            collector.append(doc)
+
     # Collect root (max-level) chunk IDs and their level keys per file
     root_ids = []
     max_levels = set()
@@ -56,20 +70,23 @@ def raptor_retrieve(query, summary_tree, top_k_root=1, top_k_children=2):
 
     # Store all retrieved documents from all levels
     all_results = []
-    all_results.extend(root_results)  # Add root-level summaries
+    seen_ids = set()
+    add_unique(root_results, all_results, seen_ids)  # Add root-level summaries uniquely
 
     def descend(children_ids):
         if not children_ids:
             return
 
         # Retrieve next-level candidates among provided children IDs
-        k = min(top_k_children, len(children_ids))
+        # De-duplicate incoming children ids to avoid repeated fetches
+        unique_children_ids = list(dict.fromkeys(children_ids))
+        k = min(top_k_children, len(unique_children_ids))
         child_results = vectorstore.similarity_search(
             query,
             k=k,
-            filter={"id": {"$in": children_ids}}
+            filter={"id": {"$in": unique_children_ids}}
         )
-        all_results.extend(child_results)  # Add intermediate summaries (or leaves if no further children)
+        add_unique(child_results, all_results, seen_ids)  # Add intermediate summaries uniquely
 
         # Build next generation from child chunk_source metadata
         next_children_ids = []
@@ -84,17 +101,18 @@ def raptor_retrieve(query, summary_tree, top_k_root=1, top_k_children=2):
 
         # If there are no next children, these are leaves; include ALL leaves (not just top-k)
         if not next_children_ids:
-            if k < len(children_ids):
+            if k < len(unique_children_ids):
                 leaf_all = vectorstore.similarity_search(
                     query,
-                    k=len(children_ids),
-                    filter={"id": {"$in": children_ids}}
+                    k=len(unique_children_ids),
+                    filter={"id": {"$in": unique_children_ids}}
                 )
-                all_results.extend(leaf_all)
+                add_unique(leaf_all, all_results, seen_ids)
             return
 
         # Continue traversal
-        descend(next_children_ids)
+        # Dedupe next-generation children to prevent repeated descent
+        descend(list(dict.fromkeys(next_children_ids)))
 
     children = []
     for doc in root_results:
@@ -105,102 +123,11 @@ def raptor_retrieve(query, summary_tree, top_k_root=1, top_k_children=2):
             src_list = []
         if isinstance(src_list, list):
             children.extend(src_list)
-    descend(children)
+    # De-duplicate initial children before descent
+    descend(list(dict.fromkeys(children)))
     return all_results
-
-# ...existing imports and setup...
-
-# def raptor_retrieve(query, summary_tree, top_k_root=2, top_k_children=3):
-#     """
-#     Perform RAPTOR-style hierarchical retrieval.
-#     Returns all documents from all levels traversed (root summaries, intermediate summaries, and leaf chunks).
-#     """
-
-#     # 1) Build list of root (top-level) summary IDs per file
-#     root_ids = []
-#     for file_id, file_data in summary_tree.items():
-#         levels = list(file_data["levels"].keys())
-#         max_level_key = max(levels, key=lambda x: int(x.split("_")[1]))
-#         for chunk in file_data["levels"][max_level_key]:
-#             root_ids.append(chunk["id"])
-
-#     # Helper: de-dup by metadata.id
-#     seen_ids = set()
-#     def add_unique(results, sink):
-#         for d in results:
-#             did = d.metadata.get("id")
-#             if did and did not in seen_ids:
-#                 seen_ids.add(did)
-#                 sink.append(d)
-
-#     # 2) Retrieve top-k root summaries (FIX: filter on metadata key "id", not "metadata.id")
-#     root_results = vectorstore.similarity_search(
-#         query,
-#         k=min(top_k_root, len(root_ids)) if root_ids else 0,
-#         filter={"id": {"$in": root_ids}}
-#     )
-
-#     all_results = []
-#     add_unique(root_results, all_results)
-
-#     # 3) Recursively descend using chunk_source; detect leaves via empty chunk_source
-#     def descend(children_ids):
-#         if not children_ids:
-#             return
-
-#         # Retrieve a focused subset at the current level
-#         k = min(top_k_children, len(children_ids))
-#         child_results = vectorstore.similarity_search(
-#             query,
-#             k=k,
-#             filter={"id": {"$in": children_ids}}
-#         )
-#         add_unique(child_results, all_results)
-
-#         # Compute next generation from the subset
-#         next_children_ids = []
-#         for doc in child_results:
-#             src = doc.metadata.get("chunk_source", "[]")
-#             try:
-#                 next_children_ids.extend(json.loads(src))
-#             except Exception:
-#                 # If malformed, treat as leaf
-#                 pass
-
-#         # If no next children -> we are at leaves.
-#         # Ensure we include ALL leaves, not just the top_k subset.
-#         if not next_children_ids:
-#             if k < len(children_ids):
-#                 leaf_all = vectorstore.similarity_search(
-#                     query,
-#                     k=len(children_ids),
-#                     filter={"id": {"$in": children_ids}}
-#                 )
-#                 add_unique(leaf_all, all_results)
-#             return
-
-#         # Continue down
-#         descend(next_children_ids)
-
-#     # Seed descent from root results
-#     seed_children = []
-#     for doc in root_results:
-#         src = doc.metadata.get("chunk_source", "[]")
-#         try:
-#             seed_children.extend(json.loads(src))
-#         except Exception:
-#             # if malformed, skip
-#             pass
-
-#     descend(seed_children)
-
-#     return all_results
-
 
 import json
 with open("./essentials/summary_tree.json", "r", encoding="utf-16") as f:
     summary_tr = json.loads(f.read())
-# print(summary_tr)
-# summary_tr = 
-
-print(raptor_retrieve("What is ARTSENS?",summary_tr))
+response = raptor_retrieve("What is Sphygmocor?",summary_tr)
