@@ -1,0 +1,21 @@
+question_number,question,embedding_calls,embedding_prompt_tokens,embedding_eval_tokens,embedding_wall_time_s,generation_prompt_tokens,generation_completion_tokens,generation_wall_time_s,total_wall_time_s
+1,"According to the Arteriograph manual, if a patient belongs to a Far East population (e.g., Chinese, Japanese), why should the 'Auto Jug-Sy' function be avoided?",4,152,0,2.1764,6812,274,7.9462,10.462
+2,What is the specific 'Cholesterol Paradox' mentioned in the context of Atrial Fibrillation risk factors?,4,76,0,0.5891,5042,713,5.6352,6.5117
+3,"For the Arteriograph device, what does a Standard Deviation of Aortic Pulse Wave Velocity (SD PWVao) between 0.7 m/s and 1.0 m/s indicate regarding measurement quality?",4,168,0,0.58,5291,367,3.2941,4.1547
+4,"According to the Diabetes Mellitus review, which specific viral infection has been definitively proven to cause Type 1 Diabetes in humans?",4,96,0,0.5777,5788,183,2.134,2.9899
+5,What is the 'Suprasystolic' pressure phase in the Arteriograph measurement cycle and what is its default offset value?,5,125,0,0.7457,7529,316,3.3014,4.3417
+6,"In the meta-analysis of AF risk factors, which factor showed the highest pooled Relative Risk (RR): Diabetes, Hypertension, or Obesity?",5,140,0,0.7198,2718,247,2.2042,3.2056
+7,"If a patient has a pacemaker, is the use of the Arteriograph device contraindicated?",5,85,0,0.7218,4572,186,1.9771,2.971
+8,What are the specific HbA1c and Fasting Plasma Glucose (FPG) ranges that indicate 'Pre-diabetes' according to the text?,4,116,0,0.5794,5850,445,3.9282,4.7902
+9,What is the 'Diastolic Reflection Area' (DRA) parameter used to assess?,4,72,0,0.5763,5996,202,2.2892,3.1683
+10,"According to the meta-analysis, did the study find a statistically significant association between Dyslipidemia and the incidence of Atrial Fibrillation?",5,125,0,0.7208,3510,264,2.4087,3.4042
+11,Under what specific surgical history condition should the Arteriograph cuff NOT be placed on a patient's arm?,4,84,0,0.5688,6098,430,3.9295,4.8538
+12,What is the specific quantitative relationship between BMI increase and Atrial Fibrillation risk found in the study?,5,90,0,0.7139,1914,163,1.5291,2.5136
+13,Identify the five specific genes mentioned in the text that are associated with Maturity-Onset Diabetes of the Young (MODY).,3,72,0,0.4407,6817,340,3.4871,4.2022
+14,What is the minimum age requirement for a patient to be measured with the Arteriograph device?,5,90,0,0.7209,4580,205,2.1804,3.1734
+15,How does the Arteriograph calculate the Ankle-Brachial Index (ABI)? Does it measure it automatically?,4,88,0,0.5801,6068,420,3.8205,4.6784
+16,What are the '3 Ps' listed as common symptoms of Diabetes Mellitus?,4,60,0,0.5987,4273,176,1.989,2.8681
+17,"If a patient has a severe tremor (e.g., Parkinson's disease), why is the Arteriograph measurement considered invalid?",5,135,0,0.7223,5983,294,2.9292,3.9221
+18,"According to the Diabetes text, what was the specific outcome of the 'Diabetes Prevention Program' regarding lifestyle changes?",5,110,0,0.7264,4899,219,2.3047,3.3479
+19,"What is the recommended cleaning method for the Arteriograph cuff sleeve, and what should be avoided?",4,76,0,0.5777,5027,436,3.7696,4.6582
+20,"In the AF meta-analysis, what was the finding regarding 'High-Density Lipoprotein Cholesterol' (HDL-C) levels in AF patients versus controls?",4,128,0,0.5724,3514,429,3.5662,4.406

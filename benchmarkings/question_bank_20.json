@@ -1,0 +1,142 @@
+[
+    {
+        "id": 1,
+        "question": "According to the Arteriograph manual, if a patient belongs to a Far East population (e.g., Chinese, Japanese), why should the 'Auto Jug-Sy' function be avoided?",
+        "answer": "The Auto Jug-Sy function should not be used because the Pulse Wave Velocity (PWV) value is not calculated properly for this population; only the Return Time (RT) remains accurate.",
+        "source_document": "Arteriograph-User-Manual_extracted.pdf",
+        "category": "Device Operation"
+    },
+    {
+        "id": 2,
+        "question": "What is the specific 'Cholesterol Paradox' mentioned in the context of Atrial Fibrillation risk factors?",
+        "answer": "It refers to the counterintuitive finding in some observational studies where higher blood cholesterol levels are not associated with increased AF risk, or are even inversely related, unlike typical cardiovascular disease risks.",
+        "source_document": "Association between cardiovascular risk factors and atrial fibrillation_extracted.pdf",
+        "category": "Medical Research"
+    },
+    {
+        "id": 3,
+        "question": "For the Arteriograph device, what does a Standard Deviation of Aortic Pulse Wave Velocity (SD PWVao) between 0.7 m/s and 1.0 m/s indicate regarding measurement quality?",
+        "answer": "It indicates 'Borderline' quality. The measurement can be accepted with concerns, but manual evaluation is recommended to search for appropriate waves. If it cannot be improved below 0.7 m/s, the measurement should be repeated.",
+        "source_document": "Arteriograph-User-Manual_extracted.pdf",
+        "category": "Device Troubleshooting"
+    },
+    {
+        "id": 4,
+        "question": "According to the Diabetes Mellitus review, which specific viral infection has been definitively proven to cause Type 1 Diabetes in humans?",
+        "answer": "None. The text states that although several viruses have been linked, there is currently 'insufficient proof to back up this theory in human beings'.",
+        "source_document": "An Insight on Diabetes Mellitus_extracted.pdf",
+        "category": "Medical Pathology"
+    },
+    {
+        "id": 5,
+        "question": "What is the 'Suprasystolic' pressure phase in the Arteriograph measurement cycle and what is its default offset value?",
+        "answer": "It is the phase where the cuff inflates above the systolic pressure (occluding the artery) to record pulse waves. The default offset is +35 mmHg above the measured systolic value.",
+        "source_document": "Arteriograph-User-Manual_extracted.pdf",
+        "category": "Device Physics"
+    },
+    {
+        "id": 6,
+        "question": "In the meta-analysis of AF risk factors, which factor showed the highest pooled Relative Risk (RR): Diabetes, Hypertension, or Obesity?",
+        "answer": "Hypertension, with a pooled RR of 1.68 (95% CI 1.51-1.87).",
+        "source_document": "Association between cardiovascular risk factors and atrial fibrillation_extracted.pdf",
+        "category": "Medical Statistics"
+    },
+    {
+        "id": 7,
+        "question": "If a patient has a pacemaker, is the use of the Arteriograph device contraindicated?",
+        "answer": "No, the presence of a pacemaker does not affect the applicability of the Arteriograph.",
+        "source_document": "Arteriograph-User-Manual_extracted.pdf",
+        "category": "Device Contraindications"
+    },
+    {
+        "id": 8,
+        "question": "What are the specific HbA1c and Fasting Plasma Glucose (FPG) ranges that indicate 'Pre-diabetes' according to the text?",
+        "answer": "HbA1c: 5.7% to 6.4%. Fasting Plasma Glucose: 100 mg/dL to 125 mg/dL.",
+        "source_document": "An Insight on Diabetes Mellitus_extracted.pdf",
+        "category": "Clinical Diagnosis"
+    },
+    {
+        "id": 9,
+        "question": "What is the 'Diastolic Reflection Area' (DRA) parameter used to assess?",
+        "answer": "It provides information on the quality of the left coronary filling conditions during diastole.",
+        "source_document": "Arteriograph-User-Manual_extracted.pdf",
+        "category": "Hemodynamics"
+    },
+    {
+        "id": 10,
+        "question": "According to the meta-analysis, did the study find a statistically significant association between Dyslipidemia and the incidence of Atrial Fibrillation?",
+        "answer": "No. The pooled Relative Risk was 1.12 with a 95% CI of 0.95-1.32, which is not statistically significant.",
+        "source_document": "Association between cardiovascular risk factors and atrial fibrillation_extracted.pdf",
+        "category": "Medical Research"
+    },
+    {
+        "id": 11,
+        "question": "Under what specific surgical history condition should the Arteriograph cuff NOT be placed on a patient's arm?",
+        "answer": "If the patient has undergone an extensive mastectomy on that side, or has a vascular surgery/shunt/cannula on that arm.",
+        "source_document": "Arteriograph-User-Manual_extracted.pdf",
+        "category": "Patient Safety"
+    },
+    {
+        "id": 12,
+        "question": "What is the specific quantitative relationship between BMI increase and Atrial Fibrillation risk found in the study?",
+        "answer": "The risk of AF increases by 27% (RR 1.27) for every 5 kg/m2 increase in BMI.",
+        "source_document": "Association between cardiovascular risk factors and atrial fibrillation_extracted.pdf",
+        "category": "Medical Statistics"
+    },
+    {
+        "id": 13,
+        "question": "Identify the five specific genes mentioned in the text that are associated with Maturity-Onset Diabetes of the Young (MODY).",
+        "answer": "Glucokinase (GCK), Pancreatic and duodenal homeobox 1 (PDX1), Neurogenic differentiation 1 (NEUROD1), Hepatocyte nuclear factor 4a (HNF4A), and HNF1A.",
+        "source_document": "An Insight on Diabetes Mellitus_extracted.pdf",
+        "category": "Genetics"
+    },
+    {
+        "id": 14,
+        "question": "What is the minimum age requirement for a patient to be measured with the Arteriograph device?",
+        "answer": "3 years of age.",
+        "source_document": "Arteriograph-User-Manual_extracted.pdf",
+        "category": "Device Specifications"
+    },
+    {
+        "id": 15,
+        "question": "How does the Arteriograph calculate the Ankle-Brachial Index (ABI)? Does it measure it automatically?",
+        "answer": "It calculates ABI as the ratio of Ankle SBP to Brachial SBP. It does NOT measure it automatically in one step; the ankle pressure must be measured separately (or entered manually) and the brachial pressure is measured by the device.",
+        "source_document": "Arteriograph-User-Manual_extracted.pdf",
+        "category": "Device Operation"
+    },
+    {
+        "id": 16,
+        "question": "What are the '3 Ps' listed as common symptoms of Diabetes Mellitus?",
+        "answer": "Polyuria (frequent urination), Polydipsia (increased thirst), and Polyphagia (increased hunger).",
+        "source_document": "An Insight on Diabetes Mellitus_extracted.pdf",
+        "category": "Clinical Symptoms"
+    },
+    {
+        "id": 17,
+        "question": "If a patient has a severe tremor (e.g., Parkinson's disease), why is the Arteriograph measurement considered invalid?",
+        "answer": "Tremor introduces high-frequency noise (sawtooth signal) that distorts the pulse wave shape, making it impossible to evaluate the hemodynamic parameters accurately.",
+        "source_document": "Arteriograph-User-Manual_extracted.pdf",
+        "category": "Device Limitations"
+    },
+    {
+        "id": 18,
+        "question": "According to the Diabetes text, what was the specific outcome of the 'Diabetes Prevention Program' regarding lifestyle changes?",
+        "answer": "Lifestyle changes (diet and exercise) reduced diabetes incidence by 58% over 2.8 years.",
+        "source_document": "An Insight on Diabetes Mellitus_extracted.pdf",
+        "category": "Clinical Trials"
+    },
+    {
+        "id": 19,
+        "question": "What is the recommended cleaning method for the Arteriograph cuff sleeve, and what should be avoided?",
+        "answer": "Use alcohol-based disinfectant or 70% isopropanol. Avoid disinfecting the cuff bladder and rubber tube directly; remove them before washing the sleeve. Do not use fabric softeners.",
+        "source_document": "Arteriograph-User-Manual_extracted.pdf",
+        "category": "Device Maintenance"
+    },
+    {
+        "id": 20,
+        "question": "In the AF meta-analysis, what was the finding regarding 'High-Density Lipoprotein Cholesterol' (HDL-C) levels in AF patients versus controls?",
+        "answer": "HDL-C levels were on average 0.05 mmol/L lower in patients with AF than in controls, but with significant heterogeneity.",
+        "source_document": "Association between cardiovascular risk factors and atrial fibrillation_extracted.pdf",
+        "category": "Medical Research"
+    }
+]
